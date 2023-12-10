@@ -8,7 +8,7 @@ import numpy as np
 from scipy import linalg
 
 def trace_norm(M):
-    return np.trace(linalg.sqrtm(M*M.T))
+    return np.trace(linalg.sqrtm(M@M.T))
 
 def Frob_norm_sq(M):
     return np.trace(M@M.T)
