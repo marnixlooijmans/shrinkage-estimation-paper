@@ -27,6 +27,8 @@ def linear_shrinkage(X, pi_0):
 
     S = 1/(n-1)*Y@Y.T
     Sinv = np.linalg.inv(S)
+    evals, evecs = np.linalg.eigh(Sinv)
+    Sinv = evecs @ np.diag(np.abs(evals)) @ evecs.T
 
     alpha = 1 - p/n - (1/n * trace_norm(Sinv)**2 * Frob_norm_sq(pi_0)) / (Frob_norm_sq(Sinv) * Frob_norm_sq(pi_0) - np.trace(Sinv@pi_0)**2)
     beta = np.trace(Sinv@pi_0) / Frob_norm_sq(pi_0) * (1-p/n-alpha)
