@@ -12,7 +12,7 @@ if module_path not in sys.path:
 
 from pk_tools import pk_tools
 import pk_fit_selection as fit
-   
+
 class PowerSpectrumLikelihood():
 
     def __init__(self, mat_type, est_type, nmocks, v):
@@ -34,7 +34,7 @@ class PowerSpectrumLikelihood():
         kmin=0.01
         kmax=0.1
         self.fit_selection = fit.get_fit_selection(kbins, kmin=kmin, kmax=kmax, pole_selection=pole_selection)
-        
+
         mat_path = "../output/BOSS_DR12_NGC_z1/matrices/"
         matrix = pk_tools.read_matrix(mat_path + f"n{nmocks}/{mat_type}_{est_type}/{mat_type}_18_18_{est_type}_{nmocks}_v{v}.matrix")
         if mat_type == "cov":
@@ -48,7 +48,7 @@ class PowerSpectrumLikelihood():
         elif mat_type == "pre":
             # The matrix is already the precision matrix
             Cinv = matrix
-        
+
         # Flip sign on any possible negative eigenvalues of the precision matrix and reconstruct precision matrix
         evals, evecs = np.linalg.eigh(Cinv)
         self.Cinv = evecs @ np.diag(np.abs(evals)) @ evecs.T
@@ -87,13 +87,14 @@ class PowerSpectrumLikelihood():
             return -np.inf
 
         return 0.0
-    
+
     def log_posterior(self, theta):
         return self.logprior(theta) + self.loglike(theta)
 
 def run_parameter_inference(mat_type, est_type, nmocks, start, end, ncpus):
     ndim = 2
-    nparticles = 1000
+    nparticles = 1000   # Total of number of samples at the end will be twice this number
+                        # because we are adding samples at the end.
 
     bounds = np.empty((ndim, 2))
     bounds[0] = np.array([0.5, 3.5])
@@ -120,7 +121,7 @@ def run_parameter_inference(mat_type, est_type, nmocks, start, end, ncpus):
             )
 
             sampler.run(prior_samples)
-            sampler.add_samples(1000)
+            sampler.add_samples(nparticles)
 
         results = sampler.results
         np.save(f"../output/BOSS_DR12_NGC_z1/samples/n{nmocks}/{mat_type}_{est_type}/{mat_type}_{est_type}_{nmocks}_results_v{v}", results)
@@ -133,6 +134,6 @@ if __name__ == "__main__":
     nmocks = int(sys.argv[3])
     start = int(sys.argv[4])
     end = int(sys.argv[5])
-    
+
     ncpus=2
     run_parameter_inference(mat_type, est_type, nmocks, start, end, ncpus)
