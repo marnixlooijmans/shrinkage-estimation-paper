@@ -19,7 +19,7 @@ class PowerSpectrumLikelihood():
         datapath = "../data/BOSS_DR12_NGC_z1/"
         datafile = datapath + "ps1D_BOSS_DR12_NGC_z1_COMPnbar_TSC_700_700_700_400_renorm.dat"
         self.W = pk_tools.read_matrix(datapath + "W_BOSS_DR12_NGC_z1_V6C_1_1_1_1_1_10_200_2000_averaged_v1.matrix")
-        self.M = pk_tools.read_matrix(datapath + "M_BOSS_DR12_NGC_z1_V6C_1_1_1_1_1_2000_1200.matrix")
+        self.M = pk_tools.read_matrix(datapath + "M_BOSS_DR12_NGC_z1_V6C_1_1_1_1_1_1200_2000.matrix")
 
         pk_data_dict = pk_tools.read_power(datafile, combine_bins=10)
         kbins, self.pk_data_vector = pk_tools.dict_to_vec(pk_data_dict)
@@ -39,19 +39,16 @@ class PowerSpectrumLikelihood():
         matrix = pk_tools.read_matrix(mat_path + f"n{nmocks}/{mat_type}_{est_type}/{mat_type}_18_18_{est_type}_{nmocks}_v{v}.matrix")
         if mat_type == "cov":
             # Obtain precision matrix
-            Cinv = np.linalg.inv(matrix)
+            Psi = np.linalg.inv(matrix)
             if est_type == "sample":
                 # Apply Hartlap correction
                 p = np.sum(self.fit_selection)
                 H = (nmocks-p-2) / (nmocks-1)
-                Cinv = H*Cinv
+                Psi = H*Psi
         elif mat_type == "pre":
             # The matrix is already the precision matrix
-            Cinv = matrix
-
-        # Flip sign on any possible negative eigenvalues of the precision matrix and reconstruct precision matrix
-        evals, evecs = np.linalg.eigh(Cinv)
-        self.Cinv = evecs @ np.diag(np.abs(evals)) @ evecs.T
+            Psi = matrix
+        self.Psi = Psi
 
 
     def pk_model(self, theta):
@@ -74,7 +71,7 @@ class PowerSpectrumLikelihood():
         diff = self.pk_data_vector - convolved_model
         fit_diff = diff[self.fit_selection]
 
-        return -0.5 * (fit_diff.T@self.Cinv@fit_diff)
+        return -0.5 * (fit_diff.T@self.Psi@fit_diff)
 
     def logprior(self, theta):
         b = theta[0]
