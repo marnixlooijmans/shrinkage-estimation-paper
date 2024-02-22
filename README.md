@@ -3,7 +3,8 @@
 This repository contains the initial power spectrum data, all generated data and the code used to generate these data belonging to the paper (arXiv: ...).
 All data and code in this reposity were created by me, with the exception of:
 * the initial power spectrum data in /data, which are from [here](https://fbeutler.github.io/hub/deconv_paper.html);
-* the modules required to read the initial power spectrum data in /lib/pk_tools, which are from [here](https://github.com/fbeutler/pk_tools).
+* the modules required to read the initial power spectrum data in /lib/pk_tools, which are from [here](https://github.com/fbeutler/pk_tools);
+* the notebook /notebooks/posterior_constraint_deviations.ipynb, which was written by [@MikeSWang](https://github.com/MikeSWang).
 
 The implementations of the shrinkage estimation algorithms can be found in /lib/shrinkage_estimators. The algorithms are from the following papers:
 * NERCOME for covariance matrix, Joachimi B., 2017, MNRAS, 466, L83;
