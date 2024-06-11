@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 from nbodykit.lab import cosmology
 import pocomc as pc
 from multiprocessing import Pool
